@@ -24,11 +24,15 @@
                     <div class="row">
                         <label for="cpu-brand" class="col-form-label">Brand</label>
                         <div class="col-5">
-                            <input type="text" class="form-control" id="cpu-brand" value="TEST_CPU_BRAND">
+                            <select id="cpu-brand" class="form-control" aria-label="CPUのブランドを選択">
+                                <option selected value="none">-</option>
+                            </select>
                         </div>
                         <label for="cpu-model" class="col-form-label">Model</label>
                         <div class="col-5">
-                            <input type="text" class="form-control" id="cpu-model" value="TEST_CPU_MODEL">
+                            <select id="cpu-model" class="form-control" aria-label="CPUのモデルを選択">
+                                <option selected value="none">-</option>
+                            </select>
                         </div>
                     </div>
                 </div>                
@@ -90,7 +94,7 @@
                     </div>
                 </div>
                 <div class="pb-3 mx-1">
-                    <button class="btn btn-primary col-2">Add PC</button>
+                    <button class="btn btn-primary col-2 add-btn">Add PC</button>
                 </div>           
             </div>
             <div class="bg-blue col-12">
