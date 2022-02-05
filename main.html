@@ -91,19 +91,29 @@
                     <div class="row align-items-center">
                         <label for="hdd-or-ssd" class="col-form-label">HDD<br>or<br>SSD</label>
                         <div class="col-2 col-md-2">
-                            <input type="text" class="form-control" id="hdd-or-ssd" value="SSD">
+                            <select id="hdd-or-ssd" class="form-control" aria-label="HDDorSSDを選択">
+                                <option selected value="none">-</option>
+                                <option value="hdd">HDD</option>
+                                <option value="ssd">SSD</option>
+                            </select>
                         </div>
-                        <label for="storage-capa" class="col-form-label">Brand</label>
+                        <label for="storage-capa" class="col-form-label">Storage</label>
                         <div class="col-2 col-md-2">
-                            <input type="text" class="form-control" id="storage-capa" value="2TB">
+                            <select id="storage-capa" class="form-control" aria-label="HDDorSSDを選択">
+                                <option selected value="none">-</option>
+                            </select>
                         </div>
                         <label for="storage-brand" class="col-form-label">Brand</label>
                         <div class="col-3 col-md-2">
-                            <input type="text" class="form-control" id="storage-brand" value="TEST_CPU_BRAND">
+                            <select id="storage-brand" class="form-control" aria-label="HDDorSSDを選択">
+                                <option selected value="none">-</option>
+                            </select>
                         </div>
                         <label for="storage-model" class="col-form-label">Model</label>
                         <div class="col-3 col-md-2">
-                            <input type="text" class="form-control" id="storage-model" value="TEST_CPU_MODEL">
+                            <select id="storage-model" class="form-control" aria-label="HDDorSSDを選択">
+                                <option selected value="none">-</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -116,7 +126,7 @@
                     <h3 class="text-center text-white">Your PC1</h3>
                 </div>
                 <div class="col-12 text-white pb-2">
-                    <h3 class="">CPU</h3>
+                    <h3 class="" id="cpu">CPU</h3>
                     <p class="">Brand: </p>
                     <p class="">Model: </p>
                 </div>

@@ -7,6 +7,8 @@ const getInfo = {
     "cpu": fetch(config.url + "cpu").then(response => response.json()),
     "gpu": fetch(config.url + "gpu").then(response => response.json()),
     "ram": fetch(config.url + "ram").then(response => response.json()),
+    "hdd": fetch(config.url + "hdd").then(response => response.json()),
+    "ssd": fetch(config.url + "ssd").then(response => response.json()),
 }
 
 /**
@@ -26,7 +28,7 @@ const getInfo = {
 const putBrandNames = (brands, component) => {
     const brandEle = document.getElementById(`${component}-brand`);
 
-    // optionに追加
+    brandEle.innerHTML = `<option selected value="none">-</option>`;
     for (const brand of brands) {
         brandEle.innerHTML += `<option value="${brand}">${brand}</option>`;
     }
@@ -36,19 +38,29 @@ const putBrandNames = (brands, component) => {
  * イベントリスナーで選択されたブランドからモデルを表示
  * @param {*} event イベントリスナー(addEventListenerでは関数名のみ引数に入れる)
  */
-const putBrandModels = (event) => {
+const putModelNames = (event) => {
     // 選択されたブランド名をイベントから取得
     const brand = event.currentTarget.value;
 
     // イベントのidから構成要素を取得
-    const component = event.currentTarget.id.substring(0, event.currentTarget.id.indexOf("-"));
+    const id = event.currentTarget.id.substring(0, event.currentTarget.id.indexOf("-"));
+
+    // 構成要素がstorageの場合、HDDorSSDを判断
+    const component = (id === "storage" ? document.getElementById("hdd-or-ssd").value : id);
 
     // 選択されたブランドのモデルを表示
     getInfo[component].then(data => {
-        const models = data.filter(obj => { return obj.Brand === brand; });
-        const modelEle = document.getElementById(`${component}-model`);
+        const models = data.filter(obj => { 
+            if (id === "storage") {
+                const storage = document.getElementById("storage-capa").value;
+                return obj.Brand === brand && obj.Model.indexOf(storage) > -1;
+            }
+            return obj.Brand === brand; 
+        });
+        const modelEle = document.getElementById(`${id}-model`);
+
         // optionに追加
-        modelEle.innerHTML = "";
+        modelEle.innerHTML = `<option selected value="none">-</option>`;
         for (const value of models) {
             modelEle.innerHTML += `
                 <option value="${value.Model}">${value.Model}</option>
@@ -57,32 +69,132 @@ const putBrandModels = (event) => {
     });
 };
 
+/**
+ * APIで取得したストレージのモデル名から容量(●TB or ●GB)の文字列を取得
+ * @param {*} model モデル
+ * @returns 容量
+ */
+const getStorage = (model) => {
+    // "TB" or "GB"の文字列の配列番号を取得
+    const indexOfByte = model.indexOf("TB") !== -1 ? model.indexOf("TB") + 2 : model.indexOf("GB") + 2;
+
+    // 空白を含めて単位の前5つの文字列を取得
+    const predictStr = model.substring(indexOfByte - 6, indexOfByte);
+
+    // 空白を除いた容量の文字列を返す
+    return predictStr.substring(predictStr.indexOf(" ") + 1, indexOfByte);
+}
+
+/**
+ * 文字列に"TB"が含まれているか判定
+ * @param {*} capacity 文字列
+ * @returns
+ */
+const isTB = (capacity) => { return capacity.indexOf("TB") !== -1 ? true : false; }
+
+/**
+ * 配列の前後の要素を入れ替える
+ * @param {*} index 対象の配列番号(前の番号)
+ * @param {*} value 配列
+ */
+const exchangeValue = (index, value) => {
+    const temp = value[index];
+    value[index] = value[index + 1];
+    value[index + 1] = temp;
+}
+
+/**
+ * 降順のバブルソートで容量を整列させる
+ * @param {*} data 容量の文字列が入った配列
+ */
+const bubbleSortDesc = (data) => {
+    for (let i = 0; i < data.length; i++) {
+        for (let j = 1; j < data.length - i; j++) {
+            // 比較対象が"TB"or"GB"同士の場合、数字を比較
+            if ( (isTB(data[j - 1]) && isTB(data[j])) || 
+                 (!isTB(data[j - 1]) && !isTB(data[j])) ) {
+
+                if (parseFloat(data[j - 1]) < parseFloat(data[j])) {
+                    exchangeValue(j - 1, data);
+                }
+                // 1つ隣の要素の方が数字が大きい場合、次の処理へ
+                continue;
+            }
+            // 比較対象が"GB"と"TB"(要素の順番で見て)の場合、交換
+            else if (!isTB(data[j - 1]) && isTB(data[j])) {
+                exchangeValue(j - 1, data);
+            }
+        }
+    }
+}
+
 // Step1 : Select Your CPU
 // CPUのBrandを選択肢に表示
 getInfo["cpu"].then(data => { putBrandNames(getBrandNames(data), "cpu"); });
 
 // CPUのBrandを選択すると、Modelの選択を可能にする
-document.getElementById("cpu-brand").addEventListener("change", putBrandModels);
+document.getElementById("cpu-brand").addEventListener("change", putModelNames);
 
 // Step2 : Select Your GPU
 // GPUのBrandを選択肢に表示
 getInfo["gpu"].then(data => { putBrandNames(getBrandNames(data), "gpu"); });
 
 // GPUのBrandを選択すると、Modelの選択を可能にする
-document.getElementById("gpu-brand").addEventListener("change", putBrandModels);
+document.getElementById("gpu-brand").addEventListener("change", putModelNames);
 
 // Step3 : Select Your Memory Card
 // RAMのBrandを選択肢に表示
 getInfo["ram"].then(data => { putBrandNames(getBrandNames(data), "ram"); });
 
 // GPUのBrandを選択すると、Modelの選択を可能にする
-document.getElementById("ram-brand").addEventListener("change", putBrandModels);
+document.getElementById("ram-brand").addEventListener("change", putModelNames);
 
+// Step4 : Select Your Storage
+// HDD or SSDが選択されたら容量を表示する
+document.getElementById("hdd-or-ssd").addEventListener("change", (e) => {
+    const component = e.currentTarget.value;
+    const capacityEle = document.getElementById("storage-capa");
 
-document.querySelectorAll(".add-btn")[0].addEventListener("click", () => {
-    fetch(config.url + "gpu")
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById("storage-model").value = "click";
-    })
+    getInfo[component].then(data => { 
+        const capacity = Array.from(new Set(data.map(( obj => { return getStorage(obj.Model); }))));
+
+        // バブルソートで容量の降順にする
+        bubbleSortDesc(capacity);
+
+        capacityEle.innerHTML = `<option selected value="none">-</option>`;
+        for (const value of capacity) {
+            capacityEle.innerHTML += `
+                <option value="${value}">${value}</option>
+            `;
+        }
+    });
+
+    // BrandとModelを初期化する
+    document.getElementById("storage-brand").innerHTML = `<option selected value="none">-</option>`;
+    document.getElementById("storage-model").innerHTML = `<option selected value="none">-</option>`;
+
 });
+
+document.getElementById("storage-capa").addEventListener("change", (e) => {
+    const id = document.getElementById("hdd-or-ssd").value;
+    const capacity = e.currentTarget.value;
+
+    getInfo[id].then(data => { 
+        // 選択した容量に該当しないブランドは除外
+        const validModels = data.filter(obj => { return obj.Model.indexOf(capacity) > -1; });
+
+        // storageのBrandを選択肢に表示
+        putBrandNames(getBrandNames(validModels), "storage");
+    });
+
+    // Modelを初期化する
+    document.getElementById("storage-model").innerHTML = `<option selected value="none">-</option>`;
+
+});
+
+// StorageのBrandを選択されたら、Modelを表示
+document.getElementById("storage-brand").addEventListener("change", putModelNames);
+
+// Add PCがクリックされた時の処理
+// 項目の抜け漏れがないかチェック
+// 問題なければ、Your PC1に詳細と性能を表示
