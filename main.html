@@ -60,17 +60,27 @@
                         <h5>step3 : Select Your Memory Card</h5>
                     </div>
                     <div class="row">
-                        <label for="memory-num" class="col-form-label">How Many?</label>
+                        <label for="ram-num" class="col-form-label">How Many?</label>
                         <div class="col-2">
-                            <input type="text" class="form-control" id="memory-num" value="1">
+                            <select id="ram-num" class="form-control" aria-label="RAMの数を選択">
+                                <option selected value="none">-</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
                         </div>
-                        <label for="memory-brand" class="col-form-label">Brand</label>
+                        <label for="ram-brand" class="col-form-label">Brand</label>
                         <div class="col-3">
-                            <input type="text" class="form-control" id="memory-brand" value="TEST_CPU_BRAND">
+                            <select id="ram-brand" class="form-control" aria-label="RAMのモデルを選択">
+                                <option selected value="none">-</option>
+                            </select>
                         </div>
-                        <label for="memory-model" class="col-form-label">Model</label>
+                        <label for="ram-model" class="col-form-label">Model</label>
                         <div class="col-4">
-                            <input type="text" class="form-control" id="memory-model" value="TEST_CPU_MODEL">
+                            <select id="ram-model" class="form-control" aria-label="RAMのモデルを選択">
+                                <option selected value="none">-</option>
+                            </select>
                         </div>
                     </div>
                 </div>                

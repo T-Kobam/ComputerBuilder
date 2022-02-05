@@ -8,22 +8,35 @@ const getCpuInfo = () => fetch(config.url + "cpu").then(response => response.jso
 // GPUの情報をAPIから取得
 const getGpuInfo = () => fetch(config.url + "gpu").then(response => response.json());
 
-// Step1 : Select Your CPU
-// CPUのBrandを選択可能にする
-getCpuInfo().then(data => {
-    // 重複を排除
-    const brands = Array.from(new Set(
-        data.map((obj) => { return obj.Brand; })
-    ));
+// RAMの情報をAPIから取得
+const getRamInfo = () => fetch(config.url + "ram").then(response => response.json());
 
-    const cpuBrand = document.getElementById("cpu-brand");
+/**
+ * ブランド名を重複を除いて配列として返す
+ * @param {*} data APIで取得した配列のオブジェクト
+ * @returns ブランド名の配列
+ */
+ const getBrandName = (data) => {
+    return Array.from(new Set(data.map(( obj => { return obj.Brand; }))));
+};
+
+/**
+ * ブランド名をhtmlに追加する
+ * @param {*} brands ブランド名の配列
+ * @param {*} component 構成要素の名前(cpu, gpu, ram, ssd, hdd)
+ */
+const putBrandName = (brands, component) => {
+    const brandEle = document.getElementById(`${component}-brand`);
+
     // optionに追加
-    for (const value of brands) {
-        cpuBrand.innerHTML += `
-            <option value="${value}">${value}</option>
-        `;
+    for (const brand of brands) {
+        brandEle.innerHTML += `<option value="${brand}">${brand}</option>`;
     }
-});
+}
+
+// Step1 : Select Your CPU
+// CPUのBrandを選択肢に表示
+getCpuInfo().then(data => { putBrandName(getBrandName(data), "cpu"); });
 
 // CPUのBrandを選択すると、Modelの選択を可能にする
 document.getElementById("cpu-brand").addEventListener("change", () => {
@@ -44,22 +57,8 @@ document.getElementById("cpu-brand").addEventListener("change", () => {
 });
 
 // Step2 : Select Your GPU
-// GPUのBrandを選択可能にする
-getGpuInfo().then(data => {
-    // 重複を排除
-    const brands = Array.from(new Set(
-        data.map((obj) => { return obj.Brand; })
-    ));
-    document.getElementById("storage-model").value = data.length;
-
-    const gpuBrand = document.getElementById("gpu-brand");
-    // optionに追加
-    for (const value of brands) {
-        gpuBrand.innerHTML += `
-            <option value="${value}">${value}</option>
-        `;
-    }
-});
+// GPUのBrandを選択肢に表示
+getGpuInfo().then(data => { putBrandName(getBrandName(data), "gpu"); });
 
 // GPUのBrandを選択すると、Modelの選択を可能にする
 document.getElementById("gpu-brand").addEventListener("change", () => {
@@ -80,6 +79,27 @@ document.getElementById("gpu-brand").addEventListener("change", () => {
 });
 
 // Step3 : Select Your Memory Card
+// RAMのBrandを選択肢に表示
+getRamInfo().then(data => { putBrandName(getBrandName(data), "ram"); });
+
+// GPUのBrandを選択すると、Modelの選択を可能にする
+document.getElementById("ram-brand").addEventListener("change", () => {
+    const brand = document.getElementById("ram-brand").value;
+
+    getRamInfo().then(data => {
+        const models = data.filter(obj => { return obj.Brand === brand; });
+
+        const ramModel = document.getElementById("ram-model");
+        // optionに追加
+        ramModel.innerHTML = "";
+        for (const value of models) {
+            ramModel.innerHTML += `
+                <option value="${value.Model}">${value.Model}</option>
+            `;
+        }
+    });
+});
+
 document.querySelectorAll(".add-btn")[0].addEventListener("click", () => {
     fetch(config.url + "gpu")
     .then(response => response.json())
