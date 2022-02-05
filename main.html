@@ -43,11 +43,15 @@
                     <div class="row">
                         <label for="gpu-brand" class="col-form-label">Brand</label>
                         <div class="col-5">
-                            <input type="text" class="form-control" id="gpu-brand" value="TEST_GPU_BRAND">
+                            <select id="gpu-brand" class="form-control" aria-label="GPUのブランドを選択">
+                                <option selected value="none">-</option>
+                            </select>
                         </div>
                         <label for="gpu-model" class="col-form-label">Model</label>
                         <div class="col-5">
-                            <input type="text" class="form-control" id="gpu-model" value="TEST_GPU_MODEL">
+                            <select id="gpu-model" class="form-control" aria-label="GPUのモデルを選択">
+                                <option selected value="none">-</option>
+                            </select>
                         </div>
                     </div>
                 </div>                
