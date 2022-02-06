@@ -1,5 +1,6 @@
 const config = {
-    "url": "https://api.recursionist.io/builder/computers?type=",  
+    "url": "https://api.recursionist.io/builder/computers?type=",
+    "component": ["cpu", "gpu", "ram", "storage"],
 };
 
 // APIのオブジェクト取得
@@ -128,6 +129,48 @@ const bubbleSortDesc = (data) => {
     }
 }
 
+/**
+ * 全項目が入力されているかを確認し、性能結果にデータを代入
+ * @param {*} component 
+ * @returns 
+ */
+const validation = (component) => {
+    const showDiv = document.getElementById(component);
+
+    const brand = document.getElementById(`${component}-brand`);
+    const model = document.getElementById(`${component}-model`);
+
+    if (brand.value === "none" || model.value === "none") {
+        alert("全ての項目を入力してください");
+        return true;
+    }
+
+    if (component === "storage") {
+        const disk = document.getElementById("hdd-or-ssd");
+        const capacity = document.getElementById("storage-capa");
+        if (disk.value === "none" || capacity.value === "none") {
+            alert("全ての項目を入力してください");
+            return true;
+        }
+        showDiv.innerHTML = `
+            <h3 class="">${component.toUpperCase()}</h3>
+            <p>Disk: ${disk.value.toUpperCase()}</p>
+            <p>Storage: ${capacity.value}</p>
+            <p>Brand: ${brand.value}</p>
+            <p>Model: ${model.value}<p>
+        `;
+    } else {
+        showDiv.innerHTML = `
+            <h3 class="">${component.toUpperCase()}</h3>
+            <p>Brand: ${brand.value}</p>
+            <p>Model: ${model.value}<p>
+        `;
+    }
+
+    return false;
+};
+
+
 // Step1 : Select Your CPU
 // CPUのBrandを選択肢に表示
 getInfo["cpu"].then(data => { putBrandNames(getBrandNames(data), "cpu"); });
@@ -196,5 +239,18 @@ document.getElementById("storage-capa").addEventListener("change", (e) => {
 document.getElementById("storage-brand").addEventListener("change", putModelNames);
 
 // Add PCがクリックされた時の処理
-// 項目の抜け漏れがないかチェック
-// 問題なければ、Your PC1に詳細と性能を表示
+document.querySelectorAll(".add-btn")[0].addEventListener("click", () => {
+    // 項目の抜け漏れがないかチェック
+    for (const component of config.component) {
+        // バリデーションエラーの場合、メッセージを表示しbreak
+        if (validation(component)) {
+            break;
+        }
+    }
+   
+    // 性能結果を表示
+    // TODO: ベンチマークからスコアを計算する
+    // TODO: 処理をまとめれるからまとめる
+    document.getElementById("score").classList.remove("d-none");
+    document.getElementById("score").classList.add("d-block");
+});
