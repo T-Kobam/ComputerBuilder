@@ -1,6 +1,18 @@
 const config = {
     "url": "https://api.recursionist.io/builder/computers?type=",
     "component": ["cpu", "gpu", "ram", "storage"],
+    "workBenchMark" : {
+        "cpu": 0.6,
+        "gpu": 0.25,
+        "ram": 0.1,
+        "storage": 0.05,
+    },
+    "gameBenchMark" : {
+        "cpu": 0.6,
+        "gpu": 0.25,
+        "ram": 0.125,
+        "storage": 0.25,
+    },
 };
 
 // APIのオブジェクト取得
@@ -130,46 +142,104 @@ const bubbleSortDesc = (data) => {
 }
 
 /**
- * 全項目が入力されているかを確認し、性能結果にデータを代入
+ * 全項目が入力されているかを確認
  * @param {*} component 
  * @returns 
  */
 const validation = (component) => {
-    const showDiv = document.getElementById(component);
+    const brand = document.getElementById(`${component}-brand`).value;
+    const model = document.getElementById(`${component}-model`).value;
 
-    const brand = document.getElementById(`${component}-brand`);
-    const model = document.getElementById(`${component}-model`);
-
-    if (brand.value === "none" || model.value === "none") {
+    if (brand === "none" || model === "none") {
         alert("全ての項目を入力してください");
         return true;
     }
 
     if (component === "storage") {
-        const disk = document.getElementById("hdd-or-ssd");
-        const capacity = document.getElementById("storage-capa");
-        if (disk.value === "none" || capacity.value === "none") {
+        const disk = document.getElementById("hdd-or-ssd").value;
+        const capacity = document.getElementById("storage-capa").value;
+        if (disk === "none" || capacity === "none") {
             alert("全ての項目を入力してください");
             return true;
         }
-        showDiv.innerHTML = `
-            <h3 class="">${component.toUpperCase()}</h3>
-            <p>Disk: ${disk.value.toUpperCase()}</p>
-            <p>Storage: ${capacity.value}</p>
-            <p>Brand: ${brand.value}</p>
-            <p>Model: ${model.value}<p>
-        `;
-    } else {
-        showDiv.innerHTML = `
-            <h3 class="">${component.toUpperCase()}</h3>
-            <p>Brand: ${brand.value}</p>
-            <p>Model: ${model.value}<p>
-        `;
     }
+    createShowPage(component);
 
     return false;
 };
 
+/**
+ * 結果のページを作成
+ * @param {*} component 
+ */
+const createShowPage = (component) => {
+    const showDiv = document.getElementById(component);
+
+    const brand = document.getElementById(`${component}-brand`).value;
+    const model = document.getElementById(`${component}-model`).value;
+
+    if (component === "storage") {
+        const disk = document.getElementById("hdd-or-ssd").value;
+        const capacity = document.getElementById("storage-capa").value;
+        showDiv.innerHTML = `
+            <h3 class="">${component.toUpperCase()}</h3>
+            <p>Disk: ${disk.toUpperCase()}</p>
+            <p>Storage: ${capacity}</p>
+            <p>Brand: ${brand}</p>
+            <p>Model: ${model}<p>
+        `;
+    } else {
+        showDiv.innerHTML = `
+            <h3 class="">${component.toUpperCase()}</h3>
+            <p>Brand: ${brand}</p>
+            <p>Model: ${model}<p>
+        `;
+    }
+};
+
+/**
+ * 作業用とゲーム用の性能スコアを返す
+ * @param {*} components 
+ * @returns [作業用スコア、ゲーム用スコア]
+ */
+const calcBenchMark = () => {
+    let benchMarks = [0, 0];
+    for (const component of config.component) {
+        getInfo[component].then(data => {
+            const model = document.getElementById(`${component}-model`).value;
+            const benchMark = data.find((obj) => obj.Model === model).BenchMark;
+
+            if (component === "ram") {
+                const ramCount = document.getElementById(`${component}-num`).value;
+                // benchMarks = calcMatrix(benchMarks, [benchMark * config.workBenchMark[component] * ramCount, benchMark * config.gameBenchMark[component] * ramCount]);
+            }
+
+            // calcMatrix(benchMarks, [benchMark * config.workBenchMark[component], benchMark * config.gameBenchMark[component]]);
+        });
+    }
+
+    // document.getElementById("game-score").innerHTML = `
+    //     <h3>Gaming: ${benchMarks[1]}</h3>
+    // `;
+    // document.getElementById("work-score").innerHTML = `
+    //     <h3>Gaming: ${benchMarks[0]}</h3>
+    // `;
+}
+
+
+const calcMatrix = (x, y) => {
+    if (x.length != y.length) {
+        console.log("err");
+        return;
+    }
+
+    let result = [];
+    for (let i = 0; i < x.length; i++) {
+        result.push(x[i] + y[i]);
+    }
+
+    return result;
+}
 
 // Step1 : Select Your CPU
 // CPUのBrandを選択肢に表示
@@ -218,6 +288,7 @@ document.getElementById("hdd-or-ssd").addEventListener("change", (e) => {
 
 });
 
+// Storageが選択されたら、Brandを表示する
 document.getElementById("storage-capa").addEventListener("change", (e) => {
     const id = document.getElementById("hdd-or-ssd").value;
     const capacity = e.currentTarget.value;
@@ -246,6 +317,9 @@ document.querySelectorAll(".add-btn")[0].addEventListener("click", () => {
         if (validation(component)) {
             break;
         }
+        // TODO: Promiseはthen内で処理し終わる方が良い
+        // その方法を考える
+        calcBenchMark();
     }
    
     // 性能結果を表示
