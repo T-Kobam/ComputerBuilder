@@ -205,28 +205,25 @@ const createShowPage = (component) => {
 const calcBenchMark = () => {
     let benchMarks = [0, 0];
     for (const component of config.component) {
-        getInfo[component].then(data => {
-            const model = document.getElementById(`${component}-model`).value;
-            const benchMark = data.find((obj) => obj.Model === model).BenchMark;
+        const benchMark = document.getElementById(`${component}-benchmark`).value;
 
-            if (component === "ram") {
-                const ramCount = document.getElementById(`${component}-num`).value;
-                // benchMarks = calcMatrix(benchMarks, [benchMark * config.workBenchMark[component] * ramCount, benchMark * config.gameBenchMark[component] * ramCount]);
-            }
+        if (component === "ram") {
+            const ramCount = document.getElementById(`${component}-num`).value;
+            benchMarks = calcMatrix(benchMarks, [benchMark * config.workBenchMark[component] * ramCount, benchMark * config.gameBenchMark[component] * ramCount]);
+        }
 
-            // calcMatrix(benchMarks, [benchMark * config.workBenchMark[component], benchMark * config.gameBenchMark[component]]);
-        });
+        calcMatrix(benchMarks, [benchMark * config.workBenchMark[component], benchMark * config.gameBenchMark[component]]);
     }
 
-    // document.getElementById("game-score").innerHTML = `
-    //     <h3>Gaming: ${benchMarks[1]}</h3>
-    // `;
-    // document.getElementById("work-score").innerHTML = `
-    //     <h3>Gaming: ${benchMarks[0]}</h3>
-    // `;
+    return benchMarks;
 }
 
-
+/**
+ * N×N行列の和を計算
+ * @param {*} x 
+ * @param {*} y 
+ * @returns 
+ */
 const calcMatrix = (x, y) => {
     if (x.length != y.length) {
         console.log("err");
@@ -241,73 +238,72 @@ const calcMatrix = (x, y) => {
     return result;
 }
 
-// Step1 : Select Your CPU
-// CPUのBrandを選択肢に表示
-getInfo["cpu"].then(data => { putBrandNames(getBrandNames(data), "cpu"); });
+// 共通の初期設定
+for (const component of config.component) {
+    if (component === "storage") {
+        document.getElementById("hdd-or-ssd").addEventListener("change", (e) => {
+            const disk = e.currentTarget.value;
+            const capacityEle = document.getElementById(`${component}-capa`);
+        
+            getInfo[disk].then(data => { 
+                const capacity = Array.from(new Set(data.map(( obj => { return getStorage(obj.Model); }))));
+        
+                // バブルソートで容量の降順にする
+                bubbleSortDesc(capacity);
+        
+                capacityEle.innerHTML = `<option selected value="none">-</option>`;
+                for (const value of capacity) {
+                    capacityEle.innerHTML += `
+                        <option value="${value}">${value}</option>
+                    `;
+                }
+            });
+        
+            // BrandとModelを初期化する
+            document.getElementById(`${component}-brand`).innerHTML = `<option selected value="none">-</option>`;
+            document.getElementById(`${component}-model`).innerHTML = `<option selected value="none">-</option>`;
+        
+        });
+        
+        // Storageが選択されたら、Brandを表示する
+        document.getElementById(`${component}-capa`).addEventListener("change", (e) => {
+            const disk = document.getElementById("hdd-or-ssd").value;
+            const capacity = e.currentTarget.value;
+        
+            getInfo[disk].then(data => { 
+                // 選択した容量に該当しないブランドは除外
+                const validModels = data.filter(obj => { return obj.Model.indexOf(capacity) > -1; });
+        
+                // storageのBrandを選択肢に表示
+                putBrandNames(getBrandNames(validModels), component);
+            });
+        
+            // Modelを初期化する
+            document.getElementById(`${component}-model`).innerHTML = `<option selected value="none">-</option>`;
+        
+        });
+    } else {
+        // Brandを選択肢に表示
+        getInfo[component].then(data => { putBrandNames(getBrandNames(data), component) } );
+    }
 
-// CPUのBrandを選択すると、Modelの選択を可能にする
-document.getElementById("cpu-brand").addEventListener("change", putModelNames);
+    // Brandを選択後、Modelに選択肢を表示
+    document.getElementById(`${component}-brand`).addEventListener("change", putModelNames);
 
-// Step2 : Select Your GPU
-// GPUのBrandを選択肢に表示
-getInfo["gpu"].then(data => { putBrandNames(getBrandNames(data), "gpu"); });
-
-// GPUのBrandを選択すると、Modelの選択を可能にする
-document.getElementById("gpu-brand").addEventListener("change", putModelNames);
-
-// Step3 : Select Your Memory Card
-// RAMのBrandを選択肢に表示
-getInfo["ram"].then(data => { putBrandNames(getBrandNames(data), "ram"); });
-
-// GPUのBrandを選択すると、Modelの選択を可能にする
-document.getElementById("ram-brand").addEventListener("change", putModelNames);
-
-// Step4 : Select Your Storage
-// HDD or SSDが選択されたら容量を表示する
-document.getElementById("hdd-or-ssd").addEventListener("change", (e) => {
-    const component = e.currentTarget.value;
-    const capacityEle = document.getElementById("storage-capa");
-
-    getInfo[component].then(data => { 
-        const capacity = Array.from(new Set(data.map(( obj => { return getStorage(obj.Model); }))));
-
-        // バブルソートで容量の降順にする
-        bubbleSortDesc(capacity);
-
-        capacityEle.innerHTML = `<option selected value="none">-</option>`;
-        for (const value of capacity) {
-            capacityEle.innerHTML += `
-                <option value="${value}">${value}</option>
-            `;
+    // Modelを選択後、Benchmarkに値をセットする
+    document.getElementById(`${component}-model`).addEventListener("change", () => {
+        let componentKey = component;
+        if (component === "storage") {
+            componentKey = document.getElementById("hdd-or-ssd").value;
         }
+        getInfo[componentKey].then(data => {
+            const model = document.getElementById(`${component}-model`).value;
+            const brand = document.getElementById(`${component}-brand`).value;
+            const hardware = data.find((obj) => obj.Brand === brand && obj.Model === model)
+            document.getElementById(`${component}-benchmark`).value = hardware.Benchmark;
+        });
     });
-
-    // BrandとModelを初期化する
-    document.getElementById("storage-brand").innerHTML = `<option selected value="none">-</option>`;
-    document.getElementById("storage-model").innerHTML = `<option selected value="none">-</option>`;
-
-});
-
-// Storageが選択されたら、Brandを表示する
-document.getElementById("storage-capa").addEventListener("change", (e) => {
-    const id = document.getElementById("hdd-or-ssd").value;
-    const capacity = e.currentTarget.value;
-
-    getInfo[id].then(data => { 
-        // 選択した容量に該当しないブランドは除外
-        const validModels = data.filter(obj => { return obj.Model.indexOf(capacity) > -1; });
-
-        // storageのBrandを選択肢に表示
-        putBrandNames(getBrandNames(validModels), "storage");
-    });
-
-    // Modelを初期化する
-    document.getElementById("storage-model").innerHTML = `<option selected value="none">-</option>`;
-
-});
-
-// StorageのBrandを選択されたら、Modelを表示
-document.getElementById("storage-brand").addEventListener("change", putModelNames);
+}
 
 // Add PCがクリックされた時の処理
 document.querySelectorAll(".add-btn")[0].addEventListener("click", () => {
@@ -315,16 +311,19 @@ document.querySelectorAll(".add-btn")[0].addEventListener("click", () => {
     for (const component of config.component) {
         // バリデーションエラーの場合、メッセージを表示しbreak
         if (validation(component)) {
-            break;
+            return;
         }
-        // TODO: Promiseはthen内で処理し終わる方が良い
-        // その方法を考える
-        calcBenchMark();
     }
-   
+
+    const benchMarks = calcBenchMark();
+    document.getElementById("game-score").innerHTML = `
+    <h3>Gaming: ${Math.floor(benchMarks[1] * 100) / 100}</h3>
+    `;
+    document.getElementById("work-score").innerHTML = `
+        <h3>Gaming: ${Math.floor(benchMarks[0] * 100) / 100}</h3>
+    `;
+
     // 性能結果を表示
-    // TODO: ベンチマークからスコアを計算する
-    // TODO: 処理をまとめれるからまとめる
     document.getElementById("score").classList.remove("d-none");
     document.getElementById("score").classList.add("d-block");
 });
