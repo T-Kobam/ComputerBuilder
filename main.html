@@ -12,11 +12,11 @@
     </head>
 
     <body>
-        <div class="d-flex flex-wrap bg-pink w-100">
+        <div class="d-flex flex-wrap w-100">
             <div class="bg-gray col-12 text-center py-2">
                 <h1 class="text-white"><font face="futura">Build Your Own Computer</font></h1>
             </div>
-            <div class="bg-red col-12 my-3">
+            <div class="col-12 my-3">
                 <!-- CPU選択div -->
                 <div class="form-group pb-2 mx-3">
                     <input type="hidden" id="cpu-benchmark">
@@ -25,14 +25,14 @@
                     </div>
                     <div class="row">
                         <label for="cpu-brand" class="col-form-label">Brand</label>
-                        <div class="col-5">
-                            <select id="cpu-brand" class="form-control" aria-label="CPUのブランドを選択">
+                        <div class="col-md-5">
+                            <select id="cpu-brand" class="custom-select" aria-label="CPUのブランドを選択">
                                 <option selected value="none">-</option>
                             </select>
                         </div>
                         <label for="cpu-model" class="col-form-label">Model</label>
-                        <div class="col-5">
-                            <select id="cpu-model" class="form-control" aria-label="CPUのモデルを選択">
+                        <div class="col-md-5">
+                            <select id="cpu-model" class="custom-select" aria-label="CPUのモデルを選択">
                                 <option selected value="none">-</option>
                             </select>
                         </div>
@@ -46,14 +46,14 @@
                     </div>
                     <div class="row">
                         <label for="gpu-brand" class="col-form-label">Brand</label>
-                        <div class="col-5">
-                            <select id="gpu-brand" class="form-control" aria-label="GPUのブランドを選択">
+                        <div class="col-md-5">
+                            <select id="gpu-brand" class="custom-select" aria-label="GPUのブランドを選択">
                                 <option selected value="none">-</option>
                             </select>
                         </div>
                         <label for="gpu-model" class="col-form-label">Model</label>
-                        <div class="col-5">
-                            <select id="gpu-model" class="form-control" aria-label="GPUのモデルを選択">
+                        <div class="col-md-5">
+                            <select id="gpu-model" class="custom-select" aria-label="GPUのモデルを選択">
                                 <option selected value="none">-</option>
                             </select>
                         </div>
@@ -67,8 +67,8 @@
                     </div>
                     <div class="row">
                         <label for="ram-num" class="col-form-label">How Many?</label>
-                        <div class="col-2">
-                            <select id="ram-num" class="form-control" aria-label="RAMの数を選択">
+                        <div class="col-md-2">
+                            <select id="ram-num" class="custom-select" aria-label="RAMの数を選択">
                                 <option selected value="none">-</option>
                                 <option value="1">1</option>
                                 <option value="2">2</option>
@@ -77,14 +77,14 @@
                             </select>
                         </div>
                         <label for="ram-brand" class="col-form-label">Brand</label>
-                        <div class="col-3">
-                            <select id="ram-brand" class="form-control" aria-label="RAMのモデルを選択">
+                        <div class="col-md-3">
+                            <select id="ram-brand" class="custom-select" aria-label="RAMのモデルを選択">
                                 <option selected value="none">-</option>
                             </select>
                         </div>
                         <label for="ram-model" class="col-form-label">Model</label>
-                        <div class="col-4">
-                            <select id="ram-model" class="form-control" aria-label="RAMのモデルを選択">
+                        <div class="col-md-4">
+                            <select id="ram-model" class="custom-select" aria-label="RAMのモデルを選択">
                                 <option selected value="none">-</option>
                             </select>
                         </div>
@@ -98,28 +98,28 @@
                     </div>
                     <div class="row align-items-center">
                         <label for="hdd-or-ssd" class="col-form-label">HDD<br>or<br>SSD</label>
-                        <div class="col-1 col-md-1">
-                            <select id="hdd-or-ssd" class="form-control" aria-label="HDDorSSDを選択">
+                        <div class="col-md-1">
+                            <select id="hdd-or-ssd" class="custom-select" aria-label="HDDorSSDを選択">
                                 <option selected value="none">-</option>
                                 <option value="hdd">HDD</option>
                                 <option value="ssd">SSD</option>
                             </select>
                         </div>
                         <label for="storage-capa" class="col-form-label">Storage</label>
-                        <div class="col-1 col-md-1">
-                            <select id="storage-capa" class="form-control" aria-label="HDDorSSDを選択">
+                        <div class="col-md-1">
+                            <select id="storage-capa" class="custom-select" aria-label="HDDorSSDを選択">
                                 <option selected value="none">-</option>
                             </select>
                         </div>
                         <label for="storage-brand" class="col-form-label">Brand</label>
-                        <div class="col-4 col-md-4">
-                            <select id="storage-brand" class="form-control" aria-label="HDDorSSDを選択">
+                        <div class="col-md-3">
+                            <select id="storage-brand" class="custom-select" aria-label="HDDorSSDを選択">
                                 <option selected value="none">-</option>
                             </select>
                         </div>
                         <label for="storage-model" class="col-form-label">Model</label>
-                        <div class="col-4 col-md-4">
-                            <select id="storage-model" class="form-control" aria-label="HDDorSSDを選択">
+                        <div class="col-md-4">
+                            <select id="storage-model" class="custom-select" aria-label="HDDorSSDを選択">
                                 <option selected value="none">-</option>
                             </select>
                         </div>
