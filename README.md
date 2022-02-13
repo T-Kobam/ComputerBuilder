@@ -1,5 +1,5 @@
 # ComputerBuilder
-  - デモ画面 : https://T-Kobam.github.io/ComputerBuilder/
+  - デモ画面 : https://T-Kobam.github.io/ComputerBuilder/main.html
   - コンピュータの主要部品を選択して構築し、その性能を評価するアプリ
   - コンピュータの主用部品は以下の4つで構成されている
     1. CPU
